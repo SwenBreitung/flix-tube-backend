@@ -21,6 +21,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         fields = ['username', 'email', 'password','password2']
         extra_kwargs = {'password': {'write_only': True}}
 
+
     def create(self, validated_data):
         print("Validated Data: ", validated_data)  # Zeigt die validierten Daten
 

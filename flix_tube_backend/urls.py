@@ -28,5 +28,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('register/', UserRegistrationView.as_view(), name='user-registration'),
     path('login/', LoginView.as_view(), name='login'),
-       path('api/create-temp-user/', CreateTemporaryUserView.as_view(), name='create_temp_user'),
+    path('api/create-temp-user/', CreateTemporaryUserView.as_view(), name='create_temp_user'),
 ]

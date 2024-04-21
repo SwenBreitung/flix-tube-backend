@@ -5,44 +5,54 @@ from rest_framework.authtoken.models import Token
 from django import forms
 from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_exempt
+from .models import UserProfile
 
+
+
+class UserProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserProfile
+        fields = ['image']
+        
+        
 class UserSerializer(serializers.ModelSerializer):
+    profile = UserProfileSerializer()
+
     class Meta:
         model = User
-        fields = '__all__'
-
-
+        fields = ['username', 'email', 'profile']
+        
+        
 class UserRegistrationSerializer(serializers.ModelSerializer):
     password2 = serializers.CharField(style={'input_type': 'password'}, write_only=True)
-
+    image = serializers.ImageField(required=False)
+    
     class Meta:
-        email = forms.EmailField(required=True)
         model = User
-        fields = ['username', 'email', 'password','password2']
+        fields = ['username', 'email', 'password', 'password2', 'image']
         extra_kwargs = {'password': {'write_only': True}}
-
+        
+    def validate(self, data):
+        if data['password'] != data['password2']:
+            raise serializers.ValidationError({'password': 'Die beiden Passwörter stimmen nicht überein.'})
+        return data
 
     def create(self, validated_data):
-        print("Validated Data: ", validated_data)  # Zeigt die validierten Daten
-
-        password = validated_data.pop('password')
-        print("Password: ", password)  # Zeigt das extrahierte Passwort
-        password2 = validated_data.pop('password2')
-        if password != password2:
-            print("Password mismatch error triggered")
-            raise serializers.ValidationError({'password': 'Die beiden Passwörter stimmen nicht überein.'})
-
-        user = User.objects.create_user(**validated_data)
-        print("User created: ", user.username)  # Zeigt den erstellten Benutzernamen
-
-        user.set_password(password)
-        print("Password set for user: ", user.username)  # Bestätigt, dass das Passwort gesetzt wurde
-
+        validated_data.pop('password2')
+        image = validated_data.pop('image', None) 
+        user = User.objects.create_user(
+            username=validated_data['username'],
+            email=validated_data['email']
+        )
+        user.set_password(validated_data['password'])
         user.save()
-        print("User saved: ", user.username)  # Bestätigt, dass der Benutzer gespeichert wurde
+
+
+        # UserProfile.objects.create(user=user)
+        UserProfile.objects.create(user=user, image=image)
 
         token = Token.objects.create(user=user)
-        print("Token created for user: ", user.username, "Token:", token.key)  # Zeigt das erstellte Token
+        print(f"Token created for user: {user.username}, Token: {token.key}")
 
         return user
 

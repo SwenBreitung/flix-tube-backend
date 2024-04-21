@@ -10,8 +10,6 @@ from .views import LoginView
 
 # Create your tests here.
 
-
-
 class LoginViewTests(APITestCase):
 
     def setUp(self):
@@ -51,6 +49,29 @@ class LoginViewTests(APITestCase):
         for _ in range(10):
             response = self.client.post(self.login_url, credentials)
         self.assertNotEqual(response.status_code, status.HTTP_200_OK)
+        
+    
+class PasswordResetView(views.APIView):
+    def post(self, request, *args, **kwargs):
+        # serializer = PasswordResetSerializer(data=request.data)
+        if serializer.is_valid():
+            uidb64 = serializer.validated_data['uidb64']
+            token = serializer.validated_data['token']
+            password = serializer.validated_data['password']
+            
+            try:
+                uid = urlsafe_base64_decode(uidb64).decode()
+                user = User.objects.get(pk=uid)
+            except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+                user = None
+            
+            if user is not None and default_token_generator.check_token(user, token):
+                user.set_password(password)
+                user.save()
+                return Response({'message': 'Password has been reset.'}, status=status.HTTP_200_OK)
+            else:
+                return Response({'error': 'Invalid token or user ID'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     # def setUp(self):
     #     # Vorbereitung: URL für den Login festlegen
     #     self.login_url = reverse('login-url')

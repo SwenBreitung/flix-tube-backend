@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
-
+import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -31,6 +31,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'django_rq',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -41,10 +42,13 @@ INSTALLED_APPS = [
     'django_filters',  
     'custom_auth',
     'corsheaders',
+    "debug_toolbar",
     'rest_framework.authtoken',
+    'video_content.apps.VideoContentConfig',
 ]
 
 MIDDLEWARE = [
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -59,6 +63,18 @@ MIDDLEWARE = [
 CORS_ALLOW_ALL_ORIGINS = True  # Für Entwicklungsphase akzeptabel, aber für Produktionsumgebungen einschränken
 
 ROOT_URLCONF = 'flix_tube_backend.urls'
+
+
+RQ_QUEUES = {
+    'default': {
+        'HOST': 'localhost',
+        'PORT': 6379,
+        'DB': 0,
+        'PASSWORD': 'foobared',
+        'DEFAULT_TIMEOUT': 360,    
+    }
+}
+
 
 TEMPLATES = [
     {
@@ -75,12 +91,25 @@ TEMPLATES = [
         },
     },
 ]
-
+FFMPEG_PATH = 'C:\\usr\\ffmpeg\\bin\\ffmpeg.exe'
 WSGI_APPLICATION = 'flix_tube_backend.wsgi.application'
 
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
+
+
+CACHES = {    
+    "default": { 
+    "BACKEND": "django_redis.cache.RedisCache",
+    "LOCATION": "redis://127.0.0.1:6379/1",
+    "OPTIONS": {"CLIENT_CLASS": "django_redis.client.DefaultClient",
+                'PASSWORD': 'foobared',
+                },        
+    "KEY_PREFIX": "videoflix" }}
+
 
 DATABASES = {
     'default': {
@@ -107,6 +136,15 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+INTERNAL_IPS = [
+    '127.0.0.1',
+
+]
+
+
+CACHETTL = 60*15
+
 
 CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:5501",

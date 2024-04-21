@@ -20,13 +20,23 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from custom_auth.views import  CreateTemporaryUserView, UserRegistrationView, UserViewSet ,LoginView
+from django.conf import settings
+from django.conf.urls.static import static
+from django.urls import include, path
+from video_content.views import Video_contentView
+from django.urls import path, include
 
 router = DefaultRouter()
 router.register(r'users', UserViewSet)
 
-urlpatterns = [
+urlpatterns = [ 
+    path("__debug__/", include("debug_toolbar.urls")),
+
     path('admin/', admin.site.urls),
     path('register/', UserRegistrationView.as_view(), name='user-registration'),
     path('login/', LoginView.as_view(), name='login'),
     path('api/create-temp-user/', CreateTemporaryUserView.as_view(), name='create_temp_user'),
-]
+    path('video_content/', Video_contentView.as_view(), name='create_temp_user'),
+    path('django-rq/', include('django_rq.urls')),
+    
+] + static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)

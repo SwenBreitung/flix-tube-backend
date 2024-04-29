@@ -4,7 +4,8 @@
 **/migrations/**
 !**/migrations
 !**/migrations/__init__.py
-
+# Ignoriere das gesamte Verzeichnis staticfiles
+staticfiles/
 *.pyc
 __pycache__
 db.sqlite3

@@ -36,7 +36,7 @@ urlpatterns = [
     path('register/', UserRegistrationView.as_view(), name='user-registration'),
     path('login/', LoginView.as_view(), name='login'),
     path('api/create-temp-user/', CreateTemporaryUserView.as_view(), name='create_temp_user'),
-    path('video_content/', Video_contentView.as_view(), name='create_temp_user'),
+    path('video_content/', Video_contentView.as_view(), name='video_content'),
     path('django-rq/', include('django_rq.urls')),
     
 ] + static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)

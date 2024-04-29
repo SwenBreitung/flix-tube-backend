@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     "debug_toolbar",
     'rest_framework.authtoken',
     'video_content.apps.VideoContentConfig',
+    'import_export',
 ]
 
 MIDDLEWARE = [
@@ -60,9 +61,20 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
 ]
 
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+IMPORT_EXPORT_USE_TRANSACTIONS =True
 CORS_ALLOW_ALL_ORIGINS = True  # Für Entwicklungsphase akzeptabel, aber für Produktionsumgebungen einschränken
 
 ROOT_URLCONF = 'flix_tube_backend.urls'
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_PARSER_CLASSES': [
+        'rest_framework.parsers.JSONParser',  # Für JSON-Daten
+        'rest_framework.parsers.FormParser',  # Für Form-Daten
+        'rest_framework.parsers.MultiPartParser'  # Für Form-Daten mit Dateien
+    ]
+}
 
 
 RQ_QUEUES = {
@@ -148,6 +160,7 @@ CACHETTL = 60*15
 
 CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:5501",
+    "http://localhost:4200",
 ]
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
@@ -170,3 +183,21 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    },
+}

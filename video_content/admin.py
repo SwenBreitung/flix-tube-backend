@@ -21,5 +21,6 @@ from import_export.admin import ImportExportModelAdmin
 # admin.site.register(Video_admin)
 
 @admin.register(VideoContent)
-class VideoContentAdmin(ImportExportModelAdmin):
-    list_display = ['title', 'description']
+class VideoContentAdmin(admin.ModelAdmin):
+    list_display = ('title', 'description', 'video', 'video_imgs', 'preview_gif','id')
+    search_fields = ['title', 'description']

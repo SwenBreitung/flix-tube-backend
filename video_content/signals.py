@@ -31,8 +31,4 @@ def auto_file_delete(sender, instance, **kwargs):
         except Exception as e:
             logger.error(f'Fehler beim Löschen der Video-Datei für {instance}: {e}')
                     
-# @receiver(post_delete, sender=VideoContent)
-# def auto_file_delete(sender, instance, **kwargs):
-#     if instance.video:
-#         if os.path.isfile(instance.video.path):
-#             os.remove(instance.video.path)
+

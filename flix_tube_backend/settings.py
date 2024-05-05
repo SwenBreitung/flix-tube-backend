@@ -161,6 +161,7 @@ CACHETTL = 60*15
 CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:5501",
     "http://localhost:4200",
+    'http://127.0.0.1:8000',
 ]
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/

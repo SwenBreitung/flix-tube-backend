@@ -32,18 +32,21 @@ class Video_contentView(viewsets.ModelViewSet):
     serializer_class = Video_contentSerializer
     # Create your views here.   
 
-
+    def increment_view_count(self):
+        self.view_count += 1
+        self.save()
+        
+        
     def get(self, request, *args, **kwargs):
+        self.increment_view_count()  
+        print('video_contents',video_contents)
         video_contents = VideoContent.objects.all()
-        # queryset = VideoContent.objects.all()
-        serializer = Video_contentSerializer(video_contents, many=True)
+        serializer = Video_contentSerializer(video_contents, many=True)        
         print('testi9ng!!!!',serializer.data)  # Debug: Überprüfe die Ausgabe des Serializers
         return Response(serializer.data)
 
     def post(self, request, *args, **kwargs):
-        print("Empfangene Daten:", request.data)
-        # logger.debug("Empfangene Request-Daten: %s", request.data)
-        
+        print("Empfangene Daten:", request.data)    
         # Erstellen des Serializers mit Daten aus request.data, die sowohl Dateien als auch normale Daten enthalten können
         serializer = Video_contentSerializer(data=request.data)
         print(serializer.data) 
@@ -51,16 +54,13 @@ class Video_contentView(viewsets.ModelViewSet):
 
         if serializer.is_valid():
             print("is_valid: ", serializer)
-            # Speichern des Serializers und Erstellen eines neuen VideoContent-Objekts
             video_content = serializer.save()
-            # Überprüfen, ob ein Thumbnail vorhanden ist, wenn nicht, erstelle eines
             print("vor erste 1 if abfrage!!!!!!!!!!!",video_content)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
-            # logger.error("Validierungsfehler: %s", serializer.errors)
             print('error', serializer.errors)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        
+
 
 
 

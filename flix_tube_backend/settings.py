@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'video_content.apps.VideoContentConfig',
     'import_export',
+    'likeapp', 
 ]
 
 MIDDLEWARE = [

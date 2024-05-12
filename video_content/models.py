@@ -11,14 +11,19 @@ class VideoContent(models.Model):
     created_at = models.DateTimeField(auto_now_add=True) 
     video_imgs = models.FileField(upload_to='video_imgs/',blank=True, null=True)
     preview_gif = models.FileField(upload_to='video_gifs/',blank=True, null=True)
-    viewCount = models.IntegerField(default=0)  
-    
-    def increment_view_count(self):
-        self.view_count += 1
-        self.save()
+    view_count = models.IntegerField(default=0) 
+
         
         
     def __str__(self):
         return self.title
+    
 
+    @property
+    def up_likes_count(self):
+        return self.like_set.filter(like_type='up').count()
+
+    @property
+    def down_likes_count(self):
+        return self.like_set.filter(like_type='down').count()
 # Create your models here.

@@ -1,6 +1,7 @@
 from rest_framework import viewsets, serializers
 
 from flix_tube_backend.settings import MEDIA_ROOT
+from likeapp.models import Like
 from .models import VideoContent
 import os
 from moviepy.editor import VideoFileClip
@@ -12,13 +13,31 @@ from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 import datetime
 class Video_contentSerializer(serializers.ModelSerializer):
-
+    up_likes_count = serializers.SerializerMethodField()
+    down_likes_count = serializers.SerializerMethodField()
     class Meta:
-        model = VideoContent
-        # fields = ['title', 'description', 'video','video_imgs','preview_gif','created_at' ]
-        read_only_fields = ['created_at'] 
-        fields = '__all__'
+        # model = VideoContent
+        # # fields = ['title', 'description', 'video','video_imgs','preview_gif','created_at' ]
+        # fields = ('id', 'title', 'description', 'video', 'video_imgs', 'preview_gif', 'view_count', 'up_likes_count', 'down_likes_count')
+        # read_only_fields = ['created_at'] 
         
+        model = VideoContent
+        fields = ('id', 'title', 'description', 'video', 'video_imgs', 'preview_gif', 'view_count', 'up_likes_count', 'down_likes_count', 'created_at')
+        read_only_fields = ['created_at']
+        # fields = '__all__'
+        
+        
+    def get_up_likes_count(self, obj):
+        count = Like.objects.filter(video=obj, like_type='up').count()
+        print("Logging up likes count: ", count)  # Zum Debuggen
+        return Like.objects.filter(video=obj, like_type='up').count()
+
+    def get_down_likes_count(self, obj):
+        count = Like.objects.filter(video=obj, like_type='down').count()
+        print("Logging down likes count: ", count)  # Zum Debuggen
+        return Like.objects.filter(video=obj, like_type='down').count()
+    
+    
     def create_thumbnail(self,video_file):
         with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as temp_video:
             for chunk in video_file.chunks():

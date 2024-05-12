@@ -2,6 +2,7 @@ import logging
 from django_rq import enqueue
 import django_rq
 from video_content.tasks import convert720p
+from video_content.tasks import convert480p
 
 from .models import VideoContent
 from django.db.models.signals import post_save,post_delete
@@ -16,7 +17,8 @@ def video_post_save(sender, instance, created, **kwargs):
     if created:
         print('New object created')
         queue = django_rq.get_queue('default', autocommit = True)
-        queue.enqueue(convert720p,instance.video.path)
+        queue.enqueue(convert720p, instance.video.path, instance.id)
+        queue.enqueue(convert480p, instance.video.path, instance.id)
         # convert720p(instance.video.path)
     else:
         #bei update, funktion muss noch geschrieben werden 

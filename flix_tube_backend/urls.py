@@ -40,6 +40,6 @@ urlpatterns = [
     path('api/create-temp-user/', CreateTemporaryUserView.as_view(), name='create_temp_user'),
     # path('video_content/', Video_contentView.as_view(), name='video_content'),
     path('django-rq/', include('django_rq.urls')),
-    path('video_content/<int:video_id>/like', add_like, name='add_like'),
+    path('video_content/<int:video_id>/like/', add_like, name='add_like'),
     path('video_content/<int:video_id>/unlike', remove_like, name='remove_like'),
 ] + static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)

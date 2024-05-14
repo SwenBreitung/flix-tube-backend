@@ -8,5 +8,5 @@ class Like(models.Model):
     like_type = models.CharField(max_length=10, choices=(('up', 'Up'), ('down', 'Down')))
 
     class Meta:
-        unique_together = ('user', 'video')
+        unique_together = ('user','video')
 # Create your models here.

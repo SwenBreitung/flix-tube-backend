@@ -24,9 +24,11 @@ class UserRegistrationView(APIView):
         serializer = UserRegistrationSerializer(data=request.data)
         print("User created: ", serializer)
         if serializer.is_valid():
-            print("is_valid: ", serializer)
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            user = serializer.save()  # User wird erstellt und gespeichert
+            token, created = Token.objects.get_or_create(user=user)  # Token wird erstellt
+            return Response({
+                'token': token.key
+            }, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 

@@ -17,13 +17,20 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework import viewsets
 import logging
 logger = logging.getLogger(__name__)
+from django.contrib.auth.decorators import login_required
 # logger = logging.getLogger(__name__)
 
+
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import ensure_csrf_cookie
+from rest_framework.views import APIView
+from rest_framework.response import Response
 class StandardResultsSetPagination(PageNumberPagination):
     page_size = 20
     page_size_query_param = 'page_size'
     max_page_size = 100
 
+# @login_required(login_url='/login/')
 @method_decorator(cache_page(CACHETTL), name='dispatch')
 class Video_contentView(viewsets.ModelViewSet):
     pagination_class = StandardResultsSetPagination
@@ -33,7 +40,7 @@ class Video_contentView(viewsets.ModelViewSet):
     serializer_class = Video_contentSerializer
     # Create your views here.   
 
-
+    
     def increment_view_count(self):
         self.view_count + 1
         self.save()
@@ -81,4 +88,12 @@ class Video_contentView(viewsets.ModelViewSet):
         else:
             print('error', serializer.errors)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+        
+
+
+@method_decorator(ensure_csrf_cookie, name='dispatch')
+class CheckCSRFToken(APIView):
+    def get(self, request):
+        return Response({"message": "CSRF cookie set!"})
 

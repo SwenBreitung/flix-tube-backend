@@ -10,19 +10,30 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from .models import VideoContent, Like
-
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import api_view, permission_classes
 
 @require_http_methods(["POST"])
+@permission_classes([IsAuthenticated])
 def add_like(request, video_id):
-    if request.method == 'POST':
-        video = get_object_or_404(VideoContent, pk=video_id)
-        data = json.loads(request.body)
-        like_type = data.get('likeType', 'up')  # Standardwert 'up', falls nichts gesendet wird
-        like, created = Like.objects.get_or_create(video=video, like_type=like_type)
-        if created:
-            return JsonResponse({'status': 'like added'}, status=201)
-        else:
-            return JsonResponse({'status': 'already liked'}, status=200)
+    video = get_object_or_404(VideoContent, pk=video_id)
+    print('request', request)
+    print('video', video)
+    user = request.user  # Den authentifizierten Benutzer bekommen
+    print('user', user)
+    if not user.is_authenticated:
+        return JsonResponse({'status': 'Unauthorized'}, status=401)
+
+    data = json.loads(request.body)
+    like_type = data.get('likeType', 'up')  # Standardwert 'up', falls nichts gesendet wird
+
+    # Überprüfen, ob der Benutzer bereits dieses Video geliked hat
+    like, created = Like.objects.get_or_create(video=video, user=user, like_type=like_type)
+
+    if created:
+        return JsonResponse({'status': 'like added'}, status=201)
+    else:
+        return JsonResponse({'status': 'already liked'}, status=200)
 
 @require_http_methods(["DELETE"])
 def remove_like(request, video_id):

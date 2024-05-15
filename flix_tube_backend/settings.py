@@ -29,6 +29,8 @@ ALLOWED_HOSTS = []
 
 
 # Application definition
+SESSION_COOKIE_DOMAIN = '.local'  # Setzt das Cookie für alle Subdomains von .local
+CSRF_COOKIE_DOMAIN = '.local'
 
 INSTALLED_APPS = [
 
@@ -48,6 +50,7 @@ INSTALLED_APPS = [
     'video_content.apps.VideoContentConfig',
     'import_export',
     'likeapp', 
+    'rest_framework_simplejwt',
 ]
 
 MIDDLEWARE = [
@@ -56,12 +59,15 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+    # 'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'django.middleware.common.CommonMiddleware',
+
+   
 ]
+
+CORS_ALLOW_CREDENTIALS = True
 
 
 CORS_ALLOW_HEADERS = [
@@ -85,13 +91,21 @@ ROOT_URLCONF = 'flix_tube_backend.urls'
 
 
 REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ],
     'DEFAULT_PARSER_CLASSES': [
         'rest_framework.parsers.JSONParser',  # Für JSON-Daten
         'rest_framework.parsers.FormParser',  # Für Form-Daten
         'rest_framework.parsers.MultiPartParser'  # Für Form-Daten mit Dateien
     ]
 }
-
+SIMPLE_JWT = {
+    'AUTH_HEADER_TYPES': ('Bearer',),
+}
 
 RQ_QUEUES = {
     'default': {
@@ -132,7 +146,8 @@ MEDIA_URL = '/media/'
 CACHES = {    
     "default": { 
     "BACKEND": "django_redis.cache.RedisCache",
-    "LOCATION": "redis://127.0.0.1:6379/1",
+    # '127.0.0.1',
+    "LOCATION": "redis://localhost:6379/1",
     "OPTIONS": {"CLIENT_CLASS": "django_redis.client.DefaultClient",
                 'PASSWORD': 'foobared',
                 },        
@@ -166,8 +181,8 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 INTERNAL_IPS = [
-    '127.0.0.1',
-
+    # '127.0.0.1',
+'localhost',
 ]
 
 
@@ -175,9 +190,19 @@ CACHETTL = 60*15
 
 
 CORS_ALLOWED_ORIGINS = [
-    "http://127.0.0.1:5501",
     "http://localhost:4200",
+    "http://127.0.0.1:4200",
+    "http://127.0.0.1:5501",
     'http://127.0.0.1:8000',
+]
+
+CORS_ALLOW_METHODS = [
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
 ]
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/

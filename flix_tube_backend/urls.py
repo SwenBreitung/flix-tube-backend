@@ -24,8 +24,14 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import include, path
 from likeapp.views import add_like, remove_like
-from video_content.views import Video_contentView
+from video_content.views import CheckCSRFToken, Video_contentView
 from django.urls import path, include
+from django.urls import path
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+)
+
 
 router = DefaultRouter()
 router.register(r'users', UserViewSet)
@@ -33,10 +39,13 @@ router.register(r'video_content', Video_contentView, basename='video_content')
 
 urlpatterns = [ 
     path("", include(router.urls)),
+    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path("__debug__/", include("debug_toolbar.urls")),
     path('admin/', admin.site.urls),
     path('register/', UserRegistrationView.as_view(), name='user-registration'),
     path('login/', LoginView.as_view(), name='login'),
+    path('check_token/', CheckCSRFToken.as_view(), name='check_token'),
     path('api/create-temp-user/', CreateTemporaryUserView.as_view(), name='create_temp_user'),
     # path('video_content/', Video_contentView.as_view(), name='video_content'),
     path('django-rq/', include('django_rq.urls')),

@@ -1,12 +1,13 @@
 from django.test import TestCase
 from django.urls import reverse
 from rest_framework import status
-from rest_framework.test import APITestCase
+
 from rest_framework.authtoken.models import Token
 from django.contrib.auth.models import User
 from rest_framework.response import Response
 from custom_auth.views import create_temporary_user
 from rest_framework.views import APIView
+from rest_framework.test import APITestCase, APIClient
 
 class UserRegistrationTests(APITestCase):
 
@@ -66,16 +67,88 @@ class TemporaryUserTests(APITestCase):
         cookie = response.cookies['auth_token']
         self.assertTrue(cookie['httponly'])
     
-    # def test_login_success(self):
-    #     url = reverse('login')
-    #     data = {'username': 'test_user', 'password': 'password123'}
-    #     response = self.client.post(url, data, format='json')
-    #     self.assertEqual(response.status_code, status.HTTP_200_OK)
-    #     self.assertTrue('auth_token' in response.cookies)
-    
-    # def test_login_failure(self):
-    #     url = reverse('login')
-    #     # Send invalid credentials
-    #     data = {'username': 'test_user', 'password': 'wrong_password'}
-    #     response = self.client.post(url, data, format='json')
-    #     self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+# class LoginViewTests(APITestCase):
+#     def setUp(self):
+#         self.username = 'veroxa'
+#         self.password = 'Forstwirt1'
+#         self.user = User.objects.create_user(username=self.username, password=self.password)
+
+#     def test_successful_login(self):
+#         """
+#         Test that a user can log in successfully and that the response contains the correct HttpOnly cookie.
+#         """
+#         url = reverse('login')  # Update this with the correct URL name for your login view
+#         data = {
+#             'username': self.username,
+#             'password': self.password
+#         }
+#         response = self.client.post(url, data, format='json')
+
+#         # Assert the response is 200 OK
+#         self.assertEqual(response.status_code, 200)
+#         self.assertEqual(response.json().get('message'), 'Login successful')
+
+#         # Assert the auth_token cookie is set and is HttpOnly
+#         self.assertIn('auth_token', response.cookies)
+#         self.assertTrue(response.cookies['auth_token'].httponly)
+
+#     def test_failed_login(self):
+#         """
+#         Test that a user login fails with incorrect credentials.
+#         """
+#         url = reverse('login')  # Update this with the correct URL name for your login view
+#         data = {
+#             'username': self.username,
+#             'password': 'wrongpassword'
+#         }
+#         response = self.client.post(url, data, format='json')
+
+#         # Assert the response is 400 BAD REQUEST
+#         self.assertEqual(response.status_code, 400)
+#         self.assertEqual(response.json().get('error'), 'Invalid credentials')
+
+
+class SimpleLoginViewTests(APITestCase):
+    def setUp(self):
+        self.username = 'testuser'
+        self.password = 'password'
+        self.user = User.objects.create_user(username=self.username, password=self.password)
+
+    def test_successful_login(self):
+        """
+        Test that a user can log in successfully and that the response contains the correct token.
+        """
+        url = reverse('simple_login')
+        data = {
+            'username': self.username,
+            'password': self.password
+        }
+        response = self.client.post(url, data, format='json')
+
+        # Assert the response is 200 OK
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json().get('message'), 'Login successful')
+
+        # Assert the auth_token cookie is set and is HttpOnly
+        self.assertIn('auth_token', response.cookies)
+        auth_cookie = response.cookies['auth_token']
+        self.assertTrue(auth_cookie.get('httponly'))
+
+        # Assert the token is correct
+        self.assertEqual(response.json().get('token'), auth_cookie.value)
+
+    def test_failed_login(self):
+        """
+        Test that a user login fails with incorrect credentials.
+        """
+        url = reverse('simple_login')
+        data = {
+            'username': self.username,
+            'password': 'wrongpassword'
+        }
+        response = self.client.post(url, data, format='json')
+
+        # Assert the response is 401 UNAUTHORIZED
+        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response.json().get('error'), 'Invalid credentials')

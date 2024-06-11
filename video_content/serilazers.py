@@ -4,7 +4,7 @@ from flix_tube_backend.settings import MEDIA_ROOT
 # from likeapp.models import Like
 from .models import VideoContent
 import os
-# from moviepy.editor import VideoFileClip
+from moviepy.editor import VideoFileClip
 import tempfile
 import shutil
 # from PIL import Image
@@ -12,6 +12,8 @@ import subprocess
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 import datetime
+
+
 class Video_contentSerializer(serializers.ModelSerializer):
     up_likes_count = serializers.SerializerMethodField()
     down_likes_count = serializers.SerializerMethodField()
@@ -27,15 +29,15 @@ class Video_contentSerializer(serializers.ModelSerializer):
         # fields = '__all__'
         
         
-    def get_up_likes_count(self, obj):
-        count = Like.objects.filter(video=obj, like_type='up').count()
-        print("Logging up likes count: ", count)  # Zum Debuggen
-        return Like.objects.filter(video=obj, like_type='up').count()
+    # def get_up_likes_count(self, obj):
+    #     count = Like.objects.filter(video=obj, like_type='up').count()
+    #     print("Logging up likes count: ", count)  # Zum Debuggen
+    #     return Like.objects.filter(video=obj, like_type='up').count()
 
-    def get_down_likes_count(self, obj):
-        count = Like.objects.filter(video=obj, like_type='down').count()
-        print("Logging down likes count: ", count)  # Zum Debuggen
-        return Like.objects.filter(video=obj, like_type='down').count()
+    # def get_down_likes_count(self, obj):
+    #     count = Like.objects.filter(video=obj, like_type='down').count()
+    #     print("Logging down likes count: ", count)  # Zum Debuggen
+    #     return Like.objects.filter(video=obj, like_type='down').count()
     
     
     def create_thumbnail(self,video_file):

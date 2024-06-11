@@ -17,7 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.db import router
 from django.urls import include, path
-from custom_auth.views import TemporaryUserView, UserRegistrationView, LoginView, UserViewSet
+from custom_auth.views import CheckAuthView, SimpleLoginView, TemporaryUserView, UserRegistrationView, LoginView, UserViewSet, get_csrf_token
 from rest_framework.routers import DefaultRouter
 
 from video_content.views import Video_contentView
@@ -33,6 +33,7 @@ urlpatterns = [
     path('login/', LoginView.as_view(), name='login'),
     path('django-rq/', include('django_rq.urls')),
     path('temporary_register/', TemporaryUserView.as_view(), name='temporary_register'),
-    
-    
+    path('get_csrf_token/', get_csrf_token, name='get_csrf_token'),
+    path('simple_login/', SimpleLoginView.as_view(), name='simple_login'),
+    path('check_auth/', CheckAuthView.as_view(), name='check_auth'),
 ]

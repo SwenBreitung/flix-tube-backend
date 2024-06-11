@@ -11,7 +11,11 @@ from rest_framework.views import APIView
 from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate
 from django.views.decorators.csrf import ensure_csrf_cookie
-
+import requests
+from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
+from rest_framework.permissions import AllowAny
+from rest_framework.decorators import permission_classes
+from rest_framework.permissions import IsAuthenticated
 # Create your views here.
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -24,7 +28,14 @@ def create_temporary_user():
     token, created = Token.objects.get_or_create(user=new_user)
     return new_user, token.key
 
-
+def get_token(username, password):
+    response = requests.post('http://127.0.0.1:8000/login/', data={'username': username, 'password': password})
+    if response.status_code == 200:
+        return response.json().get('token')
+    else:
+        return None
+    
+    
 class UserRegistrationView(APIView): 
 
     def post(self, request):
@@ -44,64 +55,28 @@ class UserRegistrationView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+# This class represents a view for handling user login functionality in a Python API.
+@csrf_exempt
+@permission_classes([AllowAny])
+def get_csrf_token(request):
+    response = JsonResponse({'message': 'CSRF token set'})
+    response.set_cookie('csrftoken', request.META.get('CSRF_COOKIE'), httponly=True, secure=True, samesite='Strict')
+    return response
+
 class LoginView(APIView):
-    @ensure_csrf_cookie
-    
-    def get_csrf_token(request):
-        return JsonResponse({'message': 'CSRF token set'})
-    
-    
-    def handle_standard_login(self, username, password):
-        token_key = self.authenticate_and_get_token(username, password)
-        if token_key:
-            print("User authenticated successfully")
-            print("Token created:", token_key)
-            response = JsonResponse({'message': 'Login successful'})
-            return response
-        else:
-            print("Invalid credentials")
-            return Response({'error': 'Invalid credentials'}, status=status.HTTP_400_BAD_REQUEST)
-
-
+    @csrf_exempt
     def post(self, request):
-        print("Start api_login view")
-        print("Received data:", request.data)
-        serializer = LoginSerializer(data=request.data)
-        if serializer.is_valid():
-            print("Serializer is valid")
-            username = serializer.validated_data.get('username')
-            password = serializer.validated_data.get('password')
-            if username == 'gast':
-                return self.handle_guest_login()
-            else:
-                return self.handle_standard_login(username, password)
-        else:
-            print("Serializer errors:", serializer.errors)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-    def handle_guest_login(self):
-        new_user = self.create_temporary_user()
-        token, created = Token.objects.get_or_create(user=new_user)
-        print("Temporary user created:", new_user.username)
-        print("Token created for temporary user:", token.key)
-        return Response({'message': 'Temporary guest account created', 'token': token.key}, status=status.HTTP_201_CREATED)
-
-
-    def authenticate_and_get_token(self, username, password):
+        username = request.data.get('username')
+        password = request.data.get('password')
         user = authenticate(username=username, password=password)
         if user is not None:
+            # Authentication successful, create or get token
             token, created = Token.objects.get_or_create(user=user)
-            return token.key
+            response = JsonResponse({'message': 'Login successful'})
+            response.set_cookie('auth_token', token.key, httponly=True, secure=True, samesite='Strict')
+            return response
         else:
-            return None
-
-
-    def create_temporary_user(self):
-        unique_username = f"guest_{uuid.uuid4().hex[:8]}"
-        new_user = User.objects.create_user(username=unique_username, password=uuid.uuid4().hex)
-        new_user.save()
-        return new_user
+            return Response({'error': 'Invalid credentials'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class TemporaryUserView(APIView):
@@ -120,4 +95,44 @@ class TemporaryUserView(APIView):
             return response
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        
+
+
+class SimpleLoginView(APIView):
+    permission_classes = [AllowAny]
+
+    @csrf_exempt
+    def post(self, request):
+        username = request.data.get('username')
+        password = request.data.get('password')
+        user = authenticate(username=username, password=password)
+        if user is not None:
+            token, created = Token.objects.get_or_create(user=user)
+            response = Response({'message': 'Login successful', 'token': token.key}, status=status.HTTP_200_OK)
+            response.set_cookie(
+                key='auth_token',
+                value=token.key,
+                httponly=True,
+                secure=True,
+                samesite='Strict'
+            )
+            return response
+        else:
+            return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+        
+        
+
+class CheckAuthView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        return Response({
+            'message': 'User is authenticated',
+            'user': {
+                'id': user.id,
+                'username': user.username,
+                'email': user.email,
+            }
+        }, status=status.HTTP_200_OK)
 

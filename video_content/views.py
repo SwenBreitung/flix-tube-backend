@@ -1,3 +1,4 @@
+from django.http import JsonResponse
 from django.shortcuts import render
 from django.shortcuts import render
 from rest_framework.response import Response
@@ -13,6 +14,7 @@ from rest_framework.parsers import MultiPartParser, FormParser
 import logging
 # from moviepy.editor import VideoFileClip
 # from PIL import Image
+from rest_framework.permissions import IsAuthenticated
 import os
 from rest_framework.pagination import PageNumberPagination
 from rest_framework import viewsets
@@ -35,6 +37,7 @@ class StandardResultsSetPagination(PageNumberPagination):
 # @login_required(login_url='/login/')
 @method_decorator(cache_page(CACHETTL), name='dispatch')
 class Video_contentView(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
     pagination_class = StandardResultsSetPagination
     parser_classes = (MultiPartParser, FormParser)  
     lookup_field = 'id' 
@@ -94,8 +97,8 @@ class Video_contentView(viewsets.ModelViewSet):
         
 
 
-@method_decorator(ensure_csrf_cookie, name='dispatch')
-class CheckCSRFToken(APIView):
-    def get(self, request):
-        return Response({"message": "CSRF cookie set!"})
+def get_csrf_token(request):
+    response = JsonResponse({'message': 'CSRF token set'})
+    response.set_cookie('csrftoken', request.META.get('CSRF_COOKIE'), httponly=True, secure=True, samesite='Strict')
+    return response
 # Create your views here.

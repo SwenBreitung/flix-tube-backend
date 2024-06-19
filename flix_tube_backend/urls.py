@@ -14,13 +14,15 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from django.conf import settings
 from django.contrib import admin
 from django.db import router
 from django.urls import include, path
 from custom_auth.views import CheckAuthView, SimpleLoginView, TemporaryUserView, UserRegistrationView, LoginView, UserViewSet, get_csrf_token
 from rest_framework.routers import DefaultRouter
-
+from django.conf.urls.static import static
 from video_content.views import Video_contentView
+from likes.views import add_like, remove_like
 
 router = DefaultRouter()
 router.register(r'users', UserViewSet)
@@ -28,6 +30,7 @@ router.register(r'video_content', Video_contentView, basename='video_content')
 
 urlpatterns = [
     path('', include(router.urls)),
+    path("__debug__/", include("debug_toolbar.urls")),
     path('admin/', admin.site.urls),
     path('register/', UserRegistrationView.as_view(), name='register'),
     path('login/', LoginView.as_view(), name='login'),
@@ -36,4 +39,6 @@ urlpatterns = [
     path('get_csrf_token/', get_csrf_token, name='get_csrf_token'),
     path('simple_login/', SimpleLoginView.as_view(), name='simple_login'),
     path('check_auth/', CheckAuthView.as_view(), name='check_auth'),
-]
+    path('video_content/<int:video_id>/like/', add_like, name='video-like'),
+] + static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)
+

@@ -17,9 +17,9 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-MEDIA_URL = '/media/'
 
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
@@ -35,6 +35,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    "debug_toolbar",
     'rest_framework',
     'rest_framework.authtoken',
     'django.contrib.admin',
@@ -48,11 +49,12 @@ INSTALLED_APPS = [
     'django_rq',
     'django_filters',  
     'corsheaders',
-    # "debug_toolbar",
+    'likes'
     # 'video_content.apps.VideoContentConfig',
 ]
 
 MIDDLEWARE = [
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -165,6 +167,7 @@ RQ_QUEUES = {
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:4200",
     "http://127.0.0.1:4200",
+    
 ]
 
 CSRF_TRUSTED_ORIGINS = [
@@ -172,6 +175,12 @@ CSRF_TRUSTED_ORIGINS = [
     "http://127.0.0.1:4200",
     ]
 
+
+INTERNAL_IPS = [
+
+    "127.0.0.1",
+
+]
 CORS_ALLOW_CREDENTIALS = True
 
 

@@ -26,13 +26,13 @@ class Video_contentSerializer(serializers.ModelSerializer):
         # fields = '__all__'
         
         
-    def get_up_likes_count(self, obj):
-        count = Like.objects.filter(video=obj, like_type='up').count()
+    def get_up_likes_count(self, obj):    
+        count = Like.objects.filter(video=obj, up_like=True).count()
         print("Logging up likes count: ", count)  # Zum Debuggen
         return count
 
     def get_down_likes_count(self, obj):
-        count = Like.objects.filter(video=obj, like_type='down').count()
+        count = Like.objects.filter(video=obj, down_like=True).count()
         print("Logging down likes count: ", count)  # Zum Debuggen
         return count
     

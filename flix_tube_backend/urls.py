@@ -40,5 +40,5 @@ urlpatterns = [
     path('simple_login/', SimpleLoginView.as_view(), name='simple_login'),
     path('check_auth/', CheckAuthView.as_view(), name='check_auth'),
     path('video_content/<int:video_id>/like/', add_like, name='video-like'),
-] + static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)
+] + static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT) + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 

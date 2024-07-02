@@ -32,9 +32,9 @@ SECRET_KEY = 'django-insecure-3a&@njau_$^_y41qcf*ysa--t^9xz&$=7ajf&x)qc%vvd7(5*_
 DEBUG = True
 
 ALLOWED_HOSTS = [
-     '34.17.50.169',
-     'localhost',
-     '127.0.0.1'
+    '34.17.50.169',
+    'localhost',
+    '127.0.0.1'
 ]
 
 
@@ -137,7 +137,13 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+# Additional locations the staticfiles app will traverse
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field

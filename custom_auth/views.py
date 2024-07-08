@@ -1,6 +1,6 @@
 import uuid
 from django.http import JsonResponse
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from .serializers import UserSerializer, UserRegistrationSerializer
 from .serializers import  UserRegistrationSerializer, UserSerializer,LoginSerializer
 from rest_framework import viewsets
@@ -37,7 +37,8 @@ def get_token(username, password):
     
     
 class UserRegistrationView(APIView): 
-
+    permission_classes = [AllowAny]
+    
     def post(self, request):
         serializer = UserRegistrationSerializer(data=request.data)
         if serializer.is_valid():
@@ -64,7 +65,8 @@ def get_csrf_token(request):
     return response
 
 class LoginView(APIView):
-    @csrf_exempt
+    permission_classes = [AllowAny]
+    #@csrf_exempt
     def post(self, request):
         username = request.data.get('username')
         password = request.data.get('password')
@@ -100,7 +102,6 @@ class TemporaryUserView(APIView):
 
 class SimpleLoginView(APIView):
     permission_classes = [AllowAny]
-
     @csrf_exempt
     def post(self, request):
         username = request.data.get('username')
@@ -126,6 +127,10 @@ class CheckAuthView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
+        
+        if not request.user.is_authenticated:
+            return redirect('simple_login') 
+        # Name Ihrer Login-URL in urls.py
         user = request.user
         return Response({
             'message': 'User is authenticated',

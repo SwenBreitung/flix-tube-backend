@@ -34,8 +34,9 @@ class StandardResultsSetPagination(PageNumberPagination):
     page_size_query_param = 'page_size'
     max_page_size = 100
 
-# @login_required(login_url='/login/')
+
 @method_decorator(cache_page(CACHETTL), name='dispatch')
+# @method_decorator(login_required(login_url='simple_login'), name='dispatch')
 class Video_contentView(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     pagination_class = StandardResultsSetPagination

@@ -69,6 +69,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'corsheaders.middleware.CorsMiddleware',
+    'flix_tube_backend.middleware.CustomCookieMiddleware',
 ]
 
 ROOT_URLCONF = 'flix_tube_backend.urls'

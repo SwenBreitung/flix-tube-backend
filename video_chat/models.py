@@ -22,7 +22,7 @@ class Message(models.Model):
 class RegisterForm(UserCreationForm):
     # Optional: Füge zusätzliche Felder hinzu, wenn benötigt
     # email = forms.EmailField(required=True)
-
+    
     class Meta:
         model = User
         fields = ("username", "password1", "password2")

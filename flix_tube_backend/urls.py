@@ -18,11 +18,12 @@ from django.conf import settings
 from django.contrib import admin
 from django.db import router
 from django.urls import include, path
-from custom_auth.views import CheckAuthView, SimpleLoginView, TemporaryUserView, UserRegistrationView, LoginView, UserViewSet, get_csrf_token
+from custom_auth.views import CheckAuthView, LogoutView, SimpleLoginView, TemporaryUserView, UserRegistrationView, LoginView, UserViewSet, get_csrf_token
 from rest_framework.routers import DefaultRouter
 from django.conf.urls.static import static
-from video_content.views import Video_contentView
+from video_content.views import Video_contentView, VideoSearchView
 from likes.views import add_like, remove_like
+from custom_auth.views import GuestLoginView
 
 router = DefaultRouter()
 router.register(r'users', UserViewSet)
@@ -40,5 +41,8 @@ urlpatterns = [
     path('simple_login/', SimpleLoginView.as_view(), name='simple_login'),
     path('check_auth/', CheckAuthView.as_view(), name='check_auth'),
     path('video_content/<int:video_id>/like/', add_like, name='video-like'),
+    path('logout/', LogoutView.as_view(), name='logout'),
+    path('search/', VideoSearchView.as_view(), name='video-search'),
+    path('guest-login/', GuestLoginView.as_view(), name='guest-login'),
 ] + static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT) + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
